@@ -1,0 +1,12 @@
+# Dependencies
+node_modules
+# Build artifacts
+dist
+# Test coverage
+coverage
+# Environment files
+.env
+# Project configuration
+package-lock.json
+# TypeScript build Info
+*.tsbuildinfo

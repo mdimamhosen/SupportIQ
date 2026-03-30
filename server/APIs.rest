@@ -1,0 +1,33 @@
+@baseUrl = http://localhost:5000/api
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoidGVzdEBleGFtcGxlLmNvbSIsImlhdCI6MTc3NDc3NDMzMywiZXhwIjoxNzc0Nzc3OTMzfQ.zKkqAU5omXTZsPRADJqetgCYqa3Sx9kOtayhCWHptbY
+
+### 1. Signup
+POST {{baseUrl}}/auth/signup
+Content-Type: application/json
+
+{
+    "email": "test@example.com",
+    "password": "Password123!"
+}
+
+### 2. Login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+    "email": "test@example.com",
+    "password": "Password123!"
+}
+
+### 3. Chat with Gemini
+POST {{baseUrl}}/chat
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "message": "Hello Gemini, explain NestJS in 3 sentences."
+}
+
+### 4. Get Conversations
+GET {{baseUrl}}/conversations
+Authorization: Bearer {{token}}

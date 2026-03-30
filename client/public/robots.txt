@@ -1,0 +1,4 @@
+# robots.txt for SupportIQ
+User-agent: *
+Allow: /
+Sitemap: https://supportiq.example.com/sitemap.xml

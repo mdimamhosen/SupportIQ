@@ -1,0 +1,57 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: support-iq-db
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASS:-postgres_password}
+      POSTGRES_DB: ${DB_NAME:-nestjs_chat}
+    ports:
+      - "5435:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-nestjs_chat}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: support-iq-server
+    restart: always
+    environment:
+      - PORT=5000
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USER=${DB_USER:-postgres}
+      - DB_NAME=${DB_NAME:-nestjs_chat}
+      - DB_PASS=${DB_PASS:-postgres_password}
+      - JWT_SECRET=${JWT_SECRET:-super-secret-key-change-me-in-production}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    ports:
+      - "5050:5000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=${VITE_API_URL:-http://localhost:5050/api}
+    container_name: support-iq-client
+    restart: always
+    environment:
+      - VITE_API_URL=${VITE_API_URL:-http://localhost:5050/api}
+    ports:
+      - "8080:8000"
+    depends_on:
+      - server
+
+volumes:
+  pgdata:
