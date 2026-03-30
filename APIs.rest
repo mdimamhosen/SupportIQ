@@ -1,0 +1,69 @@
+@baseUrl = http://localhost:5050/api
+@token = YOUR_JWT_TOKEN_HERE
+
+### --- AUTHENTICATION ---
+
+### 1. Signup
+POST {{baseUrl}}/auth/signup
+Content-Type: application/json
+
+{
+    "firstName": "John",
+    "lastName": "Doe",
+    "email": "john@example.com",
+    "password": "Password123!"
+}
+
+### 2. Login
+# @name login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+    "email": "john@example.com",
+    "password": "Password123!"
+}
+
+### --- AI CHAT & CONTEXTS ---
+
+### 3. Send AI Message (New Thread)
+POST {{baseUrl}}/chat
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "message": "Explain Liquidmorphism in UI design.",
+    "contextId": null
+}
+
+### 4. Send AI Message (Follow-up in Existing Thread)
+# Replace :contextId with a real ID from the previous response
+POST {{baseUrl}}/chat
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "message": "How can I implement it in CSS?",
+    "contextId": 1
+}
+
+### 5. List Conversation Threads (Contexts)
+GET {{baseUrl}}/chat/contexts
+Authorization: Bearer {{token}}
+
+### 6. Get Message History (Specific Thread)
+# Replace :id with the context ID
+GET {{baseUrl}}/chat/context/1/messages
+Authorization: Bearer {{token}}
+
+### --- INTELLIGENCE & UTILS ---
+
+### 7. AI Text Refinement (Draft Polish)
+POST {{baseUrl}}/chat/refine
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "text": "i want to know how to build a chat app in nestjs"
+}
+
