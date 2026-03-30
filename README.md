@@ -6,6 +6,18 @@ SupportIQ is a high-end, visual-first AI chat application engineered for profess
 
 ## 🚀 Quick Start (Fresh Clone)
 
+
+## 🌀 Clone the Repository
+
+Clone the SupportIQ repository from GitHub:
+
+```bash
+git clone https://github.com/mdimamhosen/SupportIQ.git
+cd SupportIQ
+```
+
+---
+
 Get the full stack running in minutes with these four steps:
 
 ### 1. Prerequisites
