@@ -4,25 +4,38 @@ SupportIQ is a high-end, visual-first AI chat application engineered for profess
 
 ---
 
-## 🚀 Quick Start (Docker)
+## 🚀 Quick Start (Local Development)
 
-The easiest way to run the entire project is using Docker Compose.
+The fastest way to run the project is using the root-level orchestration.
 
 ### 1. Prerequisites
-- [Docker](https://www.docker.com/products/docker-desktop/)
-- [Docker Compose](https://docs.docker.com/compose/install/)
+- **Node.js** (v18+)
+- **Docker** (for the database)
 
 ### 2. Environment Configuration
-For security reasons, the AI API key is not included in the source code. You MUST provide your own Gemini API Key to run the project.
-
-Create a `.env` file in the root directory (the same folder as `docker-compose.yml`) and add the following line:
-```env
-GEMINI_API_KEY=your_actual_gemini_api_key_here
-```
-*(You must obtain a free API key from Google AI Studio if you don't have one).*
+Create a root `.env` file and provide your **GEMINI_API_KEY**. You can also check individual `.env` files in `server/` and `client/` for specific overrides.
 
 ### 3. Run the Project
-From the root directory, simply run:
+
+From the root directory, run these two commands:
+
+```bash
+# 1. Start the PostgreSQL database
+docker-compose up -d db
+
+# 2. Start both Frontend and Backend concurrently
+npm run dev
+```
+
+- **Frontend**: [http://localhost:5173](http://localhost:5173)
+- **Backend API**: [http://localhost:5000/api](http://localhost:5000/api)
+- **Database**: Port 5435 (External)
+
+---
+
+## 🐳 Docker (Full Stack)
+
+If you prefer to run the *entire* stack (including server and client) as isolated containers:
 
 ```bash
 docker compose up --build -d
@@ -30,7 +43,6 @@ docker compose up --build -d
 
 - **Frontend**: [http://localhost:8080](http://localhost:8080)
 - **Backend API**: [http://localhost:5050/api](http://localhost:5050/api)
-- **Database**: Port 5435 (External)
 
 ---
 
@@ -216,21 +228,17 @@ graph LR
 
 If you prefer to run services individually:
 
-### 1. Backend (Server)
+### 1. Root Orchestration (Recommended)
 ```bash
-cd server
-npm install
-# Copy .env.example to .env and provide your GEMINI_API_KEY
-npm run start:dev
+npm install        # Install root dependencies (concurrently)
+npm run dev        # Starts DB (if docker up), Server, and Client
 ```
 
-### 2. Frontend (Client)
-```bash
-cd client
-npm install
-npm run dev
-```
-
+### 2. Manual Setup
+If you need to run them in separate terminals:
+- **Database**: `docker-compose up -d db`
+- **Backend**: `cd server && npm run start:dev` (Port 5000)
+- **Frontend**: `cd client && npm run dev` (Port 5173)
 
 ---
 
