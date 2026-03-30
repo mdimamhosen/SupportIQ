@@ -2,9 +2,9 @@
   "name": "support-iq-root",
   "private": true,
   "scripts": {
-    "dev:server": "npm run start:dev --prefix server",
-    "dev:client": "npm run dev --prefix client",
-    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:server": "node init && npm run start:dev --prefix server",
+    "dev:client": "node init && npm run dev --prefix client",
+    "dev": "node init && concurrently \"npm run dev:server\" \"npm run dev:client\"",
     "setup": "npm install && npm install --prefix client && npm install --prefix server",
     "install:all": "npm run setup"
   },
