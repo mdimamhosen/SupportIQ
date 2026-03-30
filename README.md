@@ -4,21 +4,28 @@ SupportIQ is a high-end, visual-first AI chat application engineered for profess
 
 ---
 
-## 🚀 Quick Start (Local Development)
+## 🚀 Quick Start (Fresh Clone)
 
-The fastest way to run the project is using the root-level orchestration.
+Get the full stack running in minutes with these four steps:
 
 ### 1. Prerequisites
 - **Node.js** (v18+)
 - **Docker** (for the database)
 
-### 2. Environment Configuration
-Create a root `.env` file and provide your **GEMINI_API_KEY**. You can also check individual `.env` files in `server/` and `client/` for specific overrides.
+### 2. Installation
+From the root directory, install all dependencies (Root, Server, and Client) in one command:
+```bash
+npm run setup
+```
 
-### 3. Run the Project
+### 3. Configuration
+Create a `.env` file in the root directory and copy the template from `.env.example`:
+```bash
+cp .env.example .env
+```
+Ensure your **GEMINI_API_KEY** is provided in the `.env` file.
 
-From the root directory, run these two commands:
-
+### 4. Run the Project
 ```bash
 # 1. Start the PostgreSQL database
 docker-compose up -d db
@@ -30,31 +37,6 @@ npm run dev
 - **Frontend**: [http://localhost:5173](http://localhost:5173)
 - **Backend API**: [http://localhost:5000/api](http://localhost:5000/api)
 - **Database**: Port 5435 (External)
-
----
-
-## 🐳 Docker (Full Stack)
-
-If you prefer to run the *entire* stack (including server and client) as isolated containers:
-
-```bash
-docker compose up --build -d
-```
-
-- **Frontend**: [http://localhost:8080](http://localhost:8080)
-- **Backend API**: [http://localhost:5050/api](http://localhost:5050/api)
-
----
-
-## ✨ Key Features
-
-- **AI Chat Experience**: Dynamic responses using Google's Gemini Pro model.
-- **Sentiment Analysis**: Real-time analysis of assistant responses (Positive, Neutral, Negative) displayed with visual indicators.
-- **Typing Indicator**: Smooth, animated feedback while the AI is processing requests.
-- **Session Management**: Thread-based conversations with AI-generated titles.
-- **Responsive Design**: Fully optimized for Desktop, Tablet, and Mobile screens.
-- **JWT Authentication**: Secure user sessions and historical conversation persistence.
-- **Liquidmorphic UI**: Premium Glassmorphism aesthetics with animated mesh gradients.
 
 ---
 
@@ -224,21 +206,19 @@ graph LR
 
 ---
 
-## 🔧 Local Development Setup
+## ⚙️ Environment Variables (Root `.env`)
 
-If you prefer to run services individually:
+Create a `.env` file in the root directory. Below are the critical configuration keys:
 
-### 1. Root Orchestration (Recommended)
-```bash
-npm install        # Install root dependencies (concurrently)
-npm run dev        # Starts DB (if docker up), Server, and Client
-```
-
-### 2. Manual Setup
-If you need to run them in separate terminals:
-- **Database**: `docker-compose up -d db`
-- **Backend**: `cd server && npm run start:dev` (Port 5000)
-- **Frontend**: `cd client && npm run dev` (Port 5173)
+| Key | Default | Description |
+| :--- | :--- | :--- |
+| `PORT` | `5000` | Backend server port. |
+| `DB_HOST` | `localhost` | Database host (use `db` within Docker). |
+| `DB_PORT` | `5435` | Database port (mapped from 5432). |
+| `DB_USER` | `postgres` | Database user. |
+| `DB_PASS` | `postgres_password` | Database password. |
+| `GEMINI_API_KEY` | `Required` | Your Google Gemini AI API key. |
+| `VITE_API_URL` | `http://localhost:5000/api` | Backend endpoint for the frontend. |
 
 ---
 
@@ -247,12 +227,11 @@ If you need to run them in separate terminals:
 A pre-configured Postman collection is available for rapid backend testing and integration verification.
 
 ### 1. Import Collection
-Import the [SupportIQ.postman_collection.json](file:///c:/Error/aitask/SupportIQ.postman_collection.json) directly into Postman.
+Import the `SupportIQ.postman_collection.json` directly into Postman.
 
 ### 2. Features Included
-- **Automated Token Management**: The `Login` request includes a post-response script that automatically updates the `{{token}}` variable for all subsequent Chat requests.
-- **Environment Variables**: Uses `{{base_url}}` (default: `http://localhost:5000`) for seamless switching between local and production environments.
-- **Full Coverage**: Includes Signup, Login, Multi-turn Chat, Thread History, and AI Prompt Refinement.
+- **Automated Token Management**: The `Login` request includes a post-response script that automatically updates the `{{token}}` variable.
+- **Environment Variables**: Uses `{{base_url}}` (default: `http://localhost:5000`) for seamless switching.
 
 ---
 
@@ -262,26 +241,17 @@ SupportIQ leverages Docker for consistent environments and simplified deployment
 
 ### Service Breakdown
 1.  **`db`**: A `postgres:16-alpine` database service with health-check monitoring and persistent volume mapping (`pgdata`).
-2.  **`server`**: The NestJS backend. Wait until the database is ready (`db: service_healthy`) before initiating its connection pool.
-3.  **`client`**: The React/Vite frontend. Built using custom `Dockerfile` with the `VITE_API_URL` injected at build-time to ensure seamless communication with the backend container.
+2.  **`server`**: The NestJS backend. Waits for the database to be ready before initiating its connection pool.
+3.  **`client`**: The React/Vite frontend. Built using a custom `Dockerfile` with the `VITE_API_URL` injected at build-time.
 
-### Fast Rebuilds
-The system uses tiered caching in the `Dockerfile` to ensure that standard code changes don't require re-installing the entire `node_modules` layer.
+### Deployment (Full Stack)
+```bash
+docker compose up --build -d
+```
+- **Frontend**: [http://localhost:8080](http://localhost:8080)
+- **Backend API**: [http://localhost:5050/api](http://localhost:5050/api)
 
 ---
-
-## ⚙️ Environment Variables
-
-The application is configured via a root-level `.env` file. Below are the critical configuration keys:
-
-### Backend Configuration
-| Key | Default | Description |
-| :--- | :--- | :--- |
-| `PORT` | `5000` | The internal server port. |
-| `DB_HOST` | `db` | Database host (use `db` within Docker). |
-| `DB_NAME` | `nestjs_chat` | Target PostgreSQL database name. |
-| `JWT_SECRET` | `super-secret...` | Secret key for signing user session tokens. |
-| `GEMINI_API_KEY` | `Required` | Your Google Gemini AI API key. |
 
 ## 🏗️ Engineering Standards & Credits
 
