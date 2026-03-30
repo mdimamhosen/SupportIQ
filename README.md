@@ -1,75 +1,124 @@
-# SupportIQ - AI Powered Chat Application
+# SupportIQ - Premium AI-Powered Support Dashboard
 
-SupportIQ is a modern, responsive chat application built with **React**, **NestJS**, and **PostgreSQL**. It features real-time AI responses powered by **Google Gemini**, integrated **Sentiment Analysis**, and a sleek **Glassmorphism UI**.
+SupportIQ is a high-end, visual-first AI chat application engineered for professional support environments. It combines a **Liquidmorphic/Glassmorphic UI** with a robust **NestJS/PostgreSQL** backend, leveraging **Google Gemini AI** for intelligent, context-aware conversations.
 
-## 🚀 Quick Start (Docker)
+---
 
-The easiest way to run the entire project is using Docker Compose.
+## 🏗️ System Architecture
 
-### 1. Prerequisites
-- [Docker](https://www.docker.com/products/docker-desktop/)
-- [Docker Compose](https://docs.docker.com/compose/install/)
+SupportIQ follows a modern distributed architecture, ensuring clear separation of concerns between the reactive frontend, the structured backend, and external intelligence services.
 
-### 2. Environment Configuration
-For security reasons, the AI API key is not included in the source code. You MUST provide your own Gemini API Key to run the project.
+```mermaid
+graph TD
+    subgraph "Frontend (Vite + React)"
+        UI[Glassmorphic UI / components]
+        Store[Zustand State Management]
+        GCheck[LanguageTool API / Grammar]
+    end
 
-Create a `.env` file in the root directory (the same folder as `docker-compose.yml`) and add the following line:
-```env
-GEMINI_API_KEY=your_actual_gemini_api_key_here
+    subgraph "Backend (NestJS)"
+        Auth[JWT Authentication]
+        Chat[Chat Logic & Multi-turn History]
+        Sentiment[Real-time Sentiment Analysis]
+        Summary[Auto-Thread Summarization]
+        Cache[In-Memory Caching]
+    end
+
+    subgraph "External Services"
+        Gemini[Google Gemini 1.5 Flash]
+        LT[LanguageTool API]
+    end
+
+    subgraph "Persistence"
+        DB[(PostgreSQL)]
+    end
+
+    UI <--> Store
+    UI -- Debounced --> GCheck
+    Store <-->|HTTPS + JWT| Auth
+    Store <-->|HTTPS + JWT| Chat
+    Chat <--> Cache
+    Chat <--> Gemini
+    Chat <--> DB
+    Auth <--> DB
 ```
-*(You must obtain a free API key from Google AI Studio if you don't have one).*
 
-### 3. Run the Project
-From the root directory, simply run:
+---
 
+## 🧠 Core Logic & Data Flow
+
+### 1. The AI Conversation Loop
+The heart of SupportIQ is its multi-turn conversation logic. Every message undergoes a transformation before reaching the user:
+
+1.  **Input & Refinement**: Users can optionally use the **AI Refine** tool, which sends their draft to a specialized Gemini prompt to polish clarity and professionalism.
+2.  **Grammar Validation**: A debounced client-side hook monitors typing, checking for errors via the **LanguageTool API** without interrupting the user flow.
+3.  **Context Construction**: When a message is sent, the backend retrieves the last **10 turns** of conversation history from the database to provide the AI with full situational context.
+4.  **Intelligence Layer**: The message + history are sent to **Google Gemini**.
+    *   **Sentiment Analysis**: Simultaneously, the AI's response is analyzed to detect its emotional tone (Positive, Neutral, or Negative), which is stored for analytics.
+    *   **Auto-Summarization**: If it's the first message of a thread, a background task generates a 3-5 word professional title for the sidebar.
+5.  **Persistence & Caching**: Responses are stored in PostgreSQL and cached in memory (to handle rapid UI refreshes or regeneration requests) before being returned to the UI.
+
+### 2. Authentication & Security
+*   **JWT Strategy**: All secure routes are protected by a Passport-JWT strategy. Tokens are generated upon login/signup and persisted in `localStorage`.
+*   **Password Safety**: User credentials never touch the database in plain text; they are hashed using **Bcrypt** with 10 salt rounds.
+*   **Identity Mapping**: Every conversation and context is strictly bound to a `User` entity, ensuring data isolation between accounts.
+
+---
+
+## 📡 API Reference
+
+### Authentication
+| Endpoint | Method | Description |
+| :--- | :--- | :--- |
+| `/api/auth/signup` | POST | Register a new user account |
+| `/api/auth/login` | POST | Authenticate and receive a JWT |
+
+### Chat & AI
+| Endpoint | Method | Description |
+| :--- | :--- | :--- |
+| `/api/chat` | POST | Send a message and get an AI response (requires JWT) |
+| `/api/chat/contexts` | GET | Fetch all historical chat threads for the user |
+| `/api/chat/context/:id/messages` | GET | Retrieve full message history for a specific thread |
+| `/api/chat/refine` | POST | Use AI to polish a prompt draft |
+
+---
+
+## 🎨 Design Philosophy: Liquidmorphism
+SupportIQ isn't just a tool; it's an experience.
+-   **Glassmorphism**: UI elements use heavy backdrop blurs and subtle white borders to create depth.
+*   **Liquid Gradients**: Animated mesh gradients reflect the "alive" nature of the AI.
+-   **Zustand State**: All UI interactions (modals, sidebar toggles, message streaming) are managed via centralized reactive stores for zero-lag responsiveness.
+
+---
+
+## 🚀 Deployment & Setup
+
+### 1. Environment Variables
+You must configure the following in a `.env` file at the root:
+
+```env
+# Database
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+POSTGRES_DB=supportiq
+
+# AI Service
+GEMINI_API_KEY=your_key_here
+GEMINI_MODEL=gemini-1.5-flash-latest
+
+# Auth
+JWT_SECRET=your_super_secret_key
+JWT_EXPIRES_IN=1d
+```
+
+### 2. Docker Execution
 ```bash
 docker compose up --build -d
 ```
 
-- **Frontend**: [http://localhost:8080](http://localhost:8080)
-- **Backend API**: [http://localhost:5050/api](http://localhost:5050/api)
-- **Database**: Port 5435 (External)
+---
 
-## ✨ Key Features
-
-- **AI Chat Experience**: Dynamic responses using Google's Gemini Pro model.
-- **Sentiment Analysis**: Real-time analysis of assistant responses (Positive, Neutral, Negative) displayed with visual indicators.
-- **Typing Indicator**: Smooth, animated feedback while the AI is processing requests.
-- **Session Management**: Thread-based conversations with AI-generated titles.
-- **Responsive Design**: Fully optimized for Desktop, Tablet, and Mobile screens.
-- **JWT Authentication**: Secure user sessions and historical conversation persistence.
-
-## 🛠️ Tech Stack
-
-### Frontend
-- **Framework**: React (using React Router v7 / Vite)
-- **Styling**: Vanilla CSS with modern Glassmorphism aesthetics
-- **Icons**: Lucide React
-- **Animations**: Framer Motion
-- **State Management**: Zustand
-
-### Backend
-- **Framework**: NestJS (TypeScript)
-- **Database**: PostgreSQL
-- **ORM**: TypeORM
-- **AI**: Google GenAI SDK (Gemini)
-- **Caching**: NestJS Cache Manager
-
-## 🔧 Local Development Setup
-
-If you prefer to run services individually:
-
-### 1. Backend (Server)
-```bash
-cd server
-npm install
-# Copy .env.example to .env and provide your GEMINI_API_KEY
-npm run start:dev
-```
-
-### 2. Frontend (Client)
-```bash
-cd client
-npm install
-npm run dev
-```
+## 🛠️ Credits & Standards
+-   **Frontend**: Vite, React 19, Framer Motion, Zustand
+-   **Backend**: NestJS, TypeORM, Google GenAI SDK
+-   **Logic Design**: SOLID Principles, DRY Architecture, and Premium UX Standards.
