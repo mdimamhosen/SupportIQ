@@ -21,19 +21,23 @@ export class AuthService {
     password: string,
     firstName?: string,
     lastName?: string,
-  ): Promise<User> {
+  ): Promise<Partial<User>> {
     const existingUser = await this.usersService.findOneByEmail(email);
     if (existingUser) {
       throw new ConflictException('Email address already in use');
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    return this.usersService.create({
+    const user = await this.usersService.create({
       email,
       password: hashedPassword,
       firstName,
       lastName,
     });
+
+    const userWithoutPassword = { ...user };
+    delete (userWithoutPassword as Partial<User>).password;
+    return userWithoutPassword;
   }
 
   async login(
